@@ -62,7 +62,7 @@ func main(){
 
 	router := mux.NewRouter()
 		//arrange our route 
-	// router.HandleFunc("/users",).Methods("POST")
+	
     router.HandleFunc("/users",func  (response http.ResponseWriter, request *http.Request){
 		//user will aniticipate json
 		response.Header().Add("content-type","application/json")
@@ -80,23 +80,7 @@ func main(){
 
 	router.HandleFunc("/users/{ID}", func(response http.ResponseWriter, request *http.Request){
 		response.Header().Add("content-type","application/json")
-		// var userSlice []Users
-		// collection = client.Database("goLangTrial").Collection("user")
-		// ctx , _ := context.WithTimeout(context.Background(),10*time.Second)
-		// cursor, err := collection.Find(ctx , bson.M{}) 
-		// if err != nil {
-		// 	response.WriteHeader(http.StatusInternalServerError)
-		// 	response.Write([]byte(`{"message" : "` + err.Error() + `"}`))
-		// 	return
-		// }
-		// defer cursor.Close(ctx)
-
-		// for cursor.Next(ctx){
-		// 	var user Users
-		// 	cursor.Decode(&user)
-		// 	userSlice = append(userSlice,user)
-		// }
-		// var user bson.M
+		
 		params := mux.Vars(request)
 		ID := params["ID"]
 
@@ -117,12 +101,6 @@ func main(){
 		fmt.Println(usersFiltered)
 		json.NewEncoder(response).Encode(usersFiltered)
 
-		// result :=  client.Database("goLangTrial").Collection("user").FindOne(context.Background(),bson.M{"_id":ID})
-		// var user Users
-		// result.Decode(user)
-		// fmt.Println(result)
-		// json.NewEncoder(response).Encode(result)
-	
 
 	})
 	
