@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -25,6 +26,11 @@ type Users struct{
   Password string `json:"password,omitempty" bson:"password,omitempty"`
 }
 
+type Posts  struct{
+	Caption string `json:"caption,omitempty" bson:"name,omitempty"`
+	ImageURL string `json:"imageURL,omitempty" bson:"email,omitempty"`
+	PostedTimestamp string `json:"postedTimestamp,omitempty" bson:"password,omitempty"`
+}
 
 func main(){
 	//run by go run main.go
@@ -93,10 +99,13 @@ func main(){
 		// var user bson.M
 		params := mux.Vars(request)
 		ID := params["ID"]
+
+		objID , _ := primitive.ObjectIDFromHex(ID)
+
 		fmt.Println(ID)
 		usersCollection := client.Database("goLangTrial").Collection("user")
 		ctx , _ := context.WithTimeout(context.Background(),10*time.Second)
-		filterCursor, err := usersCollection.Find(ctx , bson.M{"_id": ID }) 
+		filterCursor, err := usersCollection.Find(ctx , bson.M{"_id": objID }) 
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -115,6 +124,17 @@ func main(){
 		// json.NewEncoder(response).Encode(result)
 	
 
+	})
+	
+	router.HandleFunc("/posts",func(response http.ResponseWriter, request *http.Request) {
+		response.Header().Add("content-type","application/json")
+		var post Posts
+
+		json.NewDecoder(request.Body).Decode(&post)
+
+		ctx , _ := context.WithTimeout(context.Background(),10*time.Second)
+		result , _ := client.Database("goLangTrial").Collection("post").InsertOne(ctx ,post)
+		json.NewEncoder(response).Encode(result)
 	})
 	http.ListenAndServe(":12345", router)
 
